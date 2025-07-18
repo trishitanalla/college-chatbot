@@ -1,0 +1,6 @@
+flask
+requests
+beautifulsoup4
+langchain
+faiss-cpu
+huggingface-hub
