@@ -1,36 +1,65 @@
-import requests
+# llama_query.py
 import os
+import requests
+from dotenv import load_dotenv
 
-# Correct endpoint for Ollama
+# Load environment variables from .env file
+load_dotenv()
+
+# Configuration from environment variables
 LLM_API_URL = os.getenv("LLM_API_URL", "http://localhost:11434/api/generate")
+LLAMA_MODEL = os.getenv("LLAMA_MODEL", "mistral:7b") # <-- FIX: Use model from .env
 
-def query_llm(prompt, max_tokens=512, temperature=0.1):
+def query_llm(prompt, temperature=0.1):
     """
-    Query Ollama model running locally (e.g., qwen:14b).
+    Query the locally running Ollama model.
     """
     payload = {
-        "model": "qwen:14b",          # Make sure this model is pulled with `ollama pull qwen:14b`
+        "model": LLAMA_MODEL,
         "prompt": prompt,
         "stream": False,
-        "temperature": temperature
+        "options": {
+            "temperature": temperature
+        }
     }
 
-    response = requests.post(LLM_API_URL, json=payload)
-    response.raise_for_status()
+    try:
+        response = requests.post(LLM_API_URL, json=payload)
+        response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+        data = response.json()
+        return data.get("response", "").strip()
+    except requests.exceptions.RequestException as e:
+        print(f"🔥 Error querying Ollama: {e}")
+        # Return a user-friendly error message
+        return "Sorry, I'm having trouble connecting to the language model. Please ensure Ollama is running."
 
-    data = response.json()
 
-    # Ollama responds with {"response": "your text"} not {"text": ...}
-    return data.get("response", "").strip()
-
-def generate_answer(prompt, retrieved_docs):
+def generate_answer(question, retrieved_docs):
     """
-    Compose the prompt with context from retrieved documents and get the answer.
+    Composes a detailed prompt with context and instructions, then queries the LLM.
     """
-    context = "\n\n".join([
-        f"[{d.metadata.get('source', 'unknown')}]:\n{d.page_content}"
+    # Create the context string from the retrieved documents
+    context = "\n\n---\n\n".join([
+        f"Source URL: {d.metadata.get('source', 'unknown')}\nContent: {d.page_content}"
         for d in retrieved_docs
     ])
 
-    full_prompt = f"{context}\n\nUser: {prompt}\nAssistant:"
-    return query_llm(full_prompt)
+    # Improved prompt template
+    prompt_template = f"""
+You are a helpful assistant for the Sri Vasavi Engineering College. Your task is to answer user questions based ONLY on the provided context from the college website.
+
+Do not use any external knowledge. If the information is not in the context, you must say "I do not have enough information from the website to answer that question."
+
+Here is the relevant context scraped from the website:
+---
+{context}
+---
+
+Based on the context above, please answer the following question.
+
+User Question: {question}
+
+Assistant's Answer:
+"""
+
+    return query_llm(prompt_template)

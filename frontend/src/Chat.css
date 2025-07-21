@@ -1,64 +1,40 @@
-/* frontend/src/Chat.css */
-
-.chat-container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 20px;
-  border: 2px solid #007bff;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  font-family: "Segoe UI", sans-serif;
+/* Add this to your Chat.css or similar stylesheet */
+.sources {
+  margin-top: 10px;
+  padding: 8px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  font-size: 0.8em;
 }
-
-h1 {
-  text-align: center;
-  color: #007bff;
-}
-
-.conversation {
-  margin-bottom: 20px;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 10px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-}
-
-.user {
-  font-weight: bold;
-  color: #333;
+.sources strong {
+  display: block;
   margin-bottom: 5px;
 }
-
-.bot {
-  color: #555;
-  margin-bottom: 15px;
+.sources ul {
+  margin: 0;
+  padding-left: 20px;
 }
-
-.input-area {
-  display: flex;
-  gap: 10px;
+.sources a {
+  color: #007bff;
+  text-decoration: none;
 }
-
-input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+.sources a:hover {
+  text-decoration: underline;
 }
-
-button {
-  padding: 10px 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
+.message.user {
+  text-align: right;
 }
-
-button:hover {
-  background-color: #0056b3;
+.message.bot {
+  text-align: left;
+}
+.message-text {
+    background: #eee;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    max-width: 80%;
+}
+.message.user .message-text {
+    background: #007bff;
+    color: white;
 }
